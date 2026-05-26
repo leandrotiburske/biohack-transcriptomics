@@ -1,4 +1,40 @@
 GeneNet pipeline https://github.com/cran/GeneNet
 - independent of topology 
+
+Gemini-suggested pipeline 
+# 1. Load required libraries
+library(GeneNet)
+library(igraph)
+
+# Setup dummy expression data (100 samples, 10 genes) for demonstration
+set.seed(42)
+mock_data <- matrix(rnorm(1000), nrow = 100, ncol = 10)
+colnames(mock_data) <- paste0("Gene", 1:10)
+
+# 2. Run the GeneNet pipeline
+pcor_matrix <- ggm.estimate.pcor(mock_data)
+edge_table  <- network.test.edges(pcor_matrix)
+
+# 3. Filter edges based on a probability threshold
+# cutoff.ggm = 0.95 means we only keep edges with a >95% posterior probability of being true
+significant_edges <- extract.network(edge_table, cutoff.ggm = 0.95)
+
+# 4. Convert the filtered edge list into an igraph object
+# We use all gene names as vertices to ensure isolated genes (all 0s) are included
+gene_names <- colnames(mock_data)
+g <- graph_from_data_frame(
+  d = significant_edges[, c("node1", "node2")], 
+  directed = FALSE, 
+  vertices = gene_names
+)
+
+# 5. Extract the 0 vs 1 Adjacency Matrix
+adj_matrix <- as_adjacency_matrix(g, sparse = FALSE)
+
+# Print the resulting matrix
+print(adj_matrix)
+
+
 WGCNA https://alexslemonade.github.io/refinebio-examples/04-advanced-topics/network-analysis_rnaseq_01_wgcna.html
 - apparently independent of topology 
+- need to decide a "soft-threshold" 
