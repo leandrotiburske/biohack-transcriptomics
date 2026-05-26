@@ -28,6 +28,27 @@ diag(adj_matrix) <- 0
 # Print a small 5x5 chunk of your final 0/1 matrix
 print(adj_matrix[1:5, 1:5])
 
+########preparation based on names 
+get the different values from the conditions: kd (knockdown), ko (knockout) and mf (multifactorial) from the same system 
+
+# Assume weight_kd, weight_ko, and weight_mf contain continuous importance scores
+
+# 1. Convert scores to ranks (higher rank = stronger edge)
+rank_kd <- matrix(rank(weight_kd), nrow=nrow(weight_kd))
+rank_ko <- matrix(rank(weight_ko), nrow=nrow(weight_ko))
+rank_mf <- matrix(rank(weight_mf), nrow=nrow(weight_mf))
+
+# 2. Average the ranks across conditions
+average_rank <- (rank_kd + rank_ko + rank_mf) / 3
+
+# 3. Apply your final 0 vs 1 threshold to the consensus ranks
+# For example, keeping the top 10% highest ranking edges
+threshold <- quantile(average_rank, 0.90)
+final_adj_matrix <- ifelse(average_rank >= threshold, 1, 0)
+diag(final_adj_matrix) <- 0
+
+
+###################################################################################
 
 
 GeneNet pipeline https://github.com/cran/GeneNet
