@@ -1,0 +1,4 @@
+GeneNet pipeline https://github.com/cran/GeneNet
+- independent of topology 
+WGCNA https://alexslemonade.github.io/refinebio-examples/04-advanced-topics/network-analysis_rnaseq_01_wgcna.html
+- apparently independent of topology 
