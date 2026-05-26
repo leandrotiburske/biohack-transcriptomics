@@ -38,3 +38,35 @@ print(adj_matrix)
 WGCNA https://alexslemonade.github.io/refinebio-examples/04-advanced-topics/network-analysis_rnaseq_01_wgcna.html
 - apparently independent of topology 
 - need to decide a "soft-threshold" 
+
+
+
+ARACNe (suggested by organisers)
+# 1. Install and load the minet package
+# BiocManager::install("minet")
+library(minet)
+
+# 2. Create mock 'in silico' gene expression data
+# Let's say 100 samples (rows) and 20 synthetic genes (columns)
+set.seed(123)
+in_silico_data <- matrix(rnorm(2000), nrow = 100, ncol = 20)
+colnames(in_silico_data) <- paste0("Gene", 1:20)
+
+# 3. Step A: Compute the Mutual Information Matrix (MIM)
+# This estimates the non-linear relationships between all pairs
+mim <- build.mim(in_silico_data, estimator = "spearman")
+
+# 4. Step B: Run the ARACNe algorithm (DPI Pruning)
+# minet will automatically prune the weakest edges using DPI
+aracne_net <- minet(mim, method = "aracne")
+
+# 5. Convert the continuous weights into a 0 vs 1 Adjacency Matrix
+# If an edge was pruned by ARACNe, its weight is exactly 0. 
+# If it survived, it has a weight > 0.
+adj_matrix <- ifelse(aracne_net > 0, 1, 0)
+
+# (Optional) Clean up: Ensure the diagonal (self-loops) is set to 0
+diag(adj_matrix) <- 0
+
+# Print a small 5x5 chunk of your final 0/1 matrix
+print(adj_matrix[1:5, 1:5])
