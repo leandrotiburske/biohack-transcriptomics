@@ -6,6 +6,7 @@ library(minet)
 # 2. Prepare the gene expression data -> filtration and normalisation
 Example data
 matrix1 
+#Orientation: Rows must be Samples, and Columns must be Genes.
 colnames(matrix1)
 
 # 3. Step A: Compute the Mutual Information Matrix (MIM)
