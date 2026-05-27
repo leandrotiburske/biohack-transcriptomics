@@ -13,7 +13,9 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { BIOHACK-TRANSCRIPTOMICS  } from './workflows/biohack-transcriptomics'
+include { BIOHACK_TRANSCRIPTOMICS  } from './workflows/biohack_transcriptomics'
+include { filterGenes } from './modules/local/filterGenes/filterGenes'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -23,7 +25,7 @@ include { BIOHACK-TRANSCRIPTOMICS  } from './workflows/biohack-transcriptomics'
 //
 // WORKFLOW: Run main analysis pipeline depending on type of input
 //
-workflow NFCORE_BIOHACK-TRANSCRIPTOMICS {
+workflow NFCORE_BIOHACK_TRANSCRIPTOMICS {
 
     take:
     samplesheet // channel: samplesheet read in from --input
@@ -33,7 +35,7 @@ workflow NFCORE_BIOHACK-TRANSCRIPTOMICS {
     //
     // WORKFLOW: Run pipeline
     //
-    BIOHACK-TRANSCRIPTOMICS (
+    BIOHACK_TRANSCRIPTOMICS (
         samplesheet
     )
 }
@@ -50,7 +52,7 @@ workflow {
     //
     // WORKFLOW: Run main workflow
     //
-    NFCORE_BIOHACK-TRANSCRIPTOMICS (
+    NFCORE_BIOHACK_TRANSCRIPTOMICS (
         params.input
     )
 }

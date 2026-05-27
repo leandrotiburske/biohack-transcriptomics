@@ -10,7 +10,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow BIOHACK-TRANSCRIPTOMICS {
+workflow BIOHACK_TRANSCRIPTOMICS {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
