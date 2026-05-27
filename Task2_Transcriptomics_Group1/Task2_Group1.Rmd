@@ -1,0 +1,193 @@
+---
+title: "Transcriptomics Pipeline Documentation - BioHackathon BITS 2026 - Group 1"
+output: html_document
+---
+
+# Overview
+
+This document explains the full GENIE3 pipeline used for gene regulatory network inference in the BioHackathon BITS 2026 Task 2.
+
+The pipeline:
+- Loads transcriptomics datasets
+- Runs GENIE3 inference
+- Converts weights into adjacency matrices
+- Matches predicted networks with gold standards
+- Evaluates performance using Precision, Recall, and F1-score
+
+---
+
+# 1. Libraries and Setup
+
+The pipeline uses the following R packages:
+
+- `GENIE3`: Gene regulatory network inference
+- `data.table`: fast data loading
+- `parallel`: computation support
+- `rmarkdown`: report generation
+
+The system is configured to use a single core to avoid memory and connection issues.
+
+---
+
+# 2. Dataset Structure
+
+The pipeline automatically detects:
+
+- Expression datasets (`.tsv`)
+- Gold standard networks (`gold`, `goldstandard` in filename)
+
+All datasets are loaded from:
+
+---
+
+# 3. Expression Loading
+
+Expression matrices are processed as follows:
+
+- Non-numeric values are converted to numeric
+- NA and infinite values are replaced with 0
+- Data is transposed if needed to ensure:
+  - rows = genes
+  - columns = samples
+- Missing gene names are automatically generated
+
+This ensures compatibility with GENIE3 requirements.
+
+---
+
+# 4. GENIE3 Model
+
+GENIE3 infers gene regulatory networks using:
+
+- Random forest regression
+- Feature importance scoring
+- Multi-tree aggregation (`nTrees = 1000`)
+
+Output:
+- A weighted adjacency matrix representing regulatory influence
+
+---
+
+# 5. Gold Standard Loading
+
+Gold networks are loaded in two possible formats:
+
+### Case 1: Edge list
+
+### Case 2: Matrix format
+
+
+The loader automatically converts both formats into a square adjacency matrix.
+
+---
+
+# 6. Gold Matching Strategy
+
+Since dataset naming is inconsistent, a **token-based similarity matching** is used:
+
+### Method:
+- Split filename into tokens (underscore-separated)
+- Remove numeric identifiers
+- Remove noise tokens (e.g. "gold", "matrix", "knockdowns")
+- Compute overlap between expression and gold tokens
+- Select best match based on maximum shared tokens
+
+This ensures robust matching across datasets.
+
+---
+
+# 7. Network Construction
+
+GENIE3 produces weighted edges.
+
+To evaluate performance:
+- Top K edges are selected
+- K is optimized using multiple multipliers:
+  - 0.5x, 1x, 2x, 3x, 5x number of genes
+
+A binary adjacency matrix is generated:
+- 1 = predicted interaction
+- 0 = no interaction
+
+---
+
+# 8. Evaluation Metrics
+
+Performance is measured using:
+
+### Precision
+Fraction of predicted edges that are correct.
+
+### Recall
+Fraction of true edges that are recovered.
+
+### F1-score
+Harmonic mean of precision and recall.
+
+These metrics are computed by comparing predicted and gold adjacency matrices.
+
+---
+
+# 9. Main Pipeline Loop
+
+For each dataset:
+
+1. Load expression data
+2. Run GENIE3
+3. Match gold standard
+4. Convert weights to adjacency matrix
+5. Test multiple K values
+6. Select best F1 configuration
+7. Save adjacency matrix
+8. Store evaluation results
+
+---
+
+# 10. Outputs
+
+The pipeline generates:
+
+### CSV files
+- `training_results.csv` → performance per dataset
+- `validation_crosscheck.csv` → gene overlap diagnostics
+- adjacency matrices per dataset
+
+### Metrics included:
+- Precision
+- Recall
+- F1-score
+- Optimal K
+
+---
+
+# 11. Validation Cross-Check
+
+A diagnostic table is generated to verify:
+
+- Gene overlap between prediction and gold standard
+- Coverage of expression vs gold networks
+
+This ensures evaluation validity.
+
+---
+
+# 12. Key Design Decisions
+
+- Single-core execution for stability
+- Robust file matching (token-based)
+- Dynamic K selection instead of fixed threshold
+- Strict handling of missing values
+- Safe matrix alignment before evaluation
+
+---
+
+# Conclusion
+
+This pipeline provides a fully automated and robust workflow for:
+
+- Gene network inference (GENIE3)
+- Cross-dataset evaluation
+- Gold standard comparison
+- Performance optimization
+
+It is designed for reproducibility and hackathon-grade robustness.
